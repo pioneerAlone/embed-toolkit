@@ -1,0 +1,40 @@
+{
+  "name": "embed-toolkit",
+  "version": "0.1.0",
+  "description": "Universal embedded development skills for Claude Code — build, flash, monitor, debug, and diagnose firmware projects across MCU platforms.",
+  "keywords": [
+    "embedded",
+    "firmware",
+    "mcu",
+    "arm-gcc",
+    "claude-code",
+    "skill",
+    "build",
+    "flash",
+    "debug",
+    "serial",
+    "gdb",
+    "openocd",
+    "jlink",
+    "freertos"
+  ],
+  "license": "MIT",
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bin": {
+    "embed-toolkit": "./install.js"
+  },
+  "files": [
+    "install.js",
+    "shared/",
+    "skills/",
+    "templates/",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
