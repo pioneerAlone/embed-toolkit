@@ -3,8 +3,10 @@
 /**
  * embed-toolkit installer
  *
- * Copies skills to ~/.claude/skills/embed-toolkit/ so Claude Code
- * can discover and use them.
+ * Installs each skill as a flat directory under ~/.claude/skills/
+ * so Claude Code can discover them (it scans one level deep for SKILL.md).
+ *
+ * Shared files go to ~/.claude/skills/embed-toolkit/shared/.
  *
  * Usage:
  *   npx embed-toolkit              # install from npm
@@ -18,10 +20,18 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 
-const INSTALL_DIR = path.join(os.homedir(), ".claude", "skills", "embed-toolkit");
-
-// Determine source directory (where the toolkit files live)
+const SKILLS_DIR = path.join(os.homedir(), ".claude", "skills");
+const SHARED_DIR = path.join(SKILLS_DIR, "embed-toolkit");
 const SRC_DIR = __dirname;
+
+const SKILL_NAMES = [
+  "embed-build",
+  "embed-flash",
+  "embed-serial",
+  "embed-debug",
+  "embed-diag",
+  "embed-workflow",
+];
 
 function ensureDir(dir) {
   if (!fs.existsSync(dir)) {
@@ -50,88 +60,133 @@ function removeDir(dir) {
 }
 
 function status() {
-  if (!fs.existsSync(INSTALL_DIR)) {
+  const installed = [];
+  const missing = [];
+  for (const name of SKILL_NAMES) {
+    const skillPath = path.join(SKILLS_DIR, name, "SKILL.md");
+    if (fs.existsSync(skillPath)) {
+      installed.push(name);
+    } else {
+      missing.push(name);
+    }
+  }
+
+  if (installed.length === 0) {
     console.log("embed-toolkit: NOT INSTALLED");
-    console.log(`  Expected at: ${INSTALL_DIR}`);
     return false;
   }
-  const skills = fs.readdirSync(path.join(INSTALL_DIR, "skills"));
+
   console.log("embed-toolkit: INSTALLED");
-  console.log(`  Location: ${INSTALL_DIR}`);
-  console.log(`  Skills (${skills.length}):`);
-  for (const s of skills) {
-    console.log(`    - ${s}`);
+  console.log(`  Skills: ${installed.length}/${SKILL_NAMES.length}`);
+  for (const s of installed) {
+    console.log(`    ✓ ${s}`);
+  }
+  if (missing.length > 0) {
+    for (const s of missing) {
+      console.log(`    ✗ ${s} (missing)`);
+    }
+  }
+  if (fs.existsSync(SHARED_DIR)) {
+    console.log(`  shared: ${SHARED_DIR}`);
   }
   return true;
 }
 
 function install() {
-  if (fs.existsSync(INSTALL_DIR)) {
-    console.log(`embed-toolkit: Already installed at ${INSTALL_DIR}`);
+  // Check if already installed
+  const alreadyInstalled = SKILL_NAMES.some((name) =>
+    fs.existsSync(path.join(SKILLS_DIR, name, "SKILL.md"))
+  );
+  if (alreadyInstalled) {
+    console.log("embed-toolkit: Already installed.");
     console.log("  Use --force to reinstall, or --uninstall to remove.");
+    status();
     return;
   }
 
   console.log("embed-toolkit installer");
   console.log(`  Source: ${SRC_DIR}`);
-  console.log(`  Target: ${INSTALL_DIR}`);
 
-  // Copy shared/
-  const sharedSrc = path.join(SRC_DIR, "shared");
-  const sharedDest = path.join(INSTALL_DIR, "shared");
-  if (fs.existsSync(sharedSrc)) {
-    copyDir(sharedSrc, sharedDest);
-    console.log("  ✓ shared/");
-  }
-
-  // Copy skills/
+  // Install each skill as a flat directory: ~/.claude/skills/embed-build/SKILL.md
   const skillsSrc = path.join(SRC_DIR, "skills");
-  const skillsDest = path.join(INSTALL_DIR, "skills");
   if (fs.existsSync(skillsSrc)) {
-    copyDir(skillsSrc, skillsDest);
-    const skillNames = fs.readdirSync(skillsSrc);
-    for (const s of skillNames) {
-      console.log(`  ✓ skills/${s}/SKILL.md`);
+    for (const name of SKILL_NAMES) {
+      const src = path.join(skillsSrc, name);
+      const dest = path.join(SKILLS_DIR, name);
+      if (fs.existsSync(src)) {
+        copyDir(src, dest);
+        console.log(`  ✓ ${name}`);
+      } else {
+        console.log(`  ✗ ${name} (source not found)`);
+      }
     }
   }
 
-  // Copy templates/
+  // Install shared/ to ~/.claude/skills/embed-toolkit/shared/
+  const sharedSrc = path.join(SRC_DIR, "shared");
+  const sharedDest = path.join(SHARED_DIR, "shared");
+  if (fs.existsSync(sharedSrc)) {
+    copyDir(sharedSrc, sharedDest);
+    console.log(`  ✓ embed-toolkit/shared/`);
+  }
+
+  // Install templates/ to ~/.claude/skills/embed-toolkit/templates/
   const tmplSrc = path.join(SRC_DIR, "templates");
-  const tmplDest = path.join(INSTALL_DIR, "templates");
+  const tmplDest = path.join(SHARED_DIR, "templates");
   if (fs.existsSync(tmplSrc)) {
     copyDir(tmplSrc, tmplDest);
-    console.log("  ✓ templates/");
+    console.log(`  ✓ embed-toolkit/templates/`);
   }
 
   console.log("");
   console.log("embed-toolkit installed successfully!");
-  console.log(`  ${INSTALL_DIR}`);
   console.log("");
   console.log("Available skills:");
-  const skillDirs = fs.readdirSync(skillsDest);
-  for (const s of skillDirs) {
-    console.log(`  /${s}`);
+  for (const name of SKILL_NAMES) {
+    console.log(`  /${name}`);
   }
 }
 
 function forceInstall() {
-  if (fs.existsSync(INSTALL_DIR)) {
-    removeDir(INSTALL_DIR);
-    console.log("  Removed previous installation.");
+  // Remove old style install if present
+  removeDir(path.join(SKILLS_DIR, "embed-toolkit", "skills"));
+  // Remove each skill
+  for (const name of SKILL_NAMES) {
+    removeDir(path.join(SKILLS_DIR, name));
   }
+  console.log("  Removed previous installation.");
   install();
+}
+
+function uninstall() {
+  let removed = 0;
+  for (const name of SKILL_NAMES) {
+    const dir = path.join(SKILLS_DIR, name);
+    if (fs.existsSync(dir)) {
+      removeDir(dir);
+      console.log(`  ✓ removed ${name}`);
+      removed++;
+    }
+  }
+  // Also remove shared if it exists
+  if (fs.existsSync(SHARED_DIR)) {
+    removeDir(SHARED_DIR);
+    console.log(`  ✓ removed embed-toolkit/shared`);
+    removed++;
+  }
+  if (removed === 0) {
+    console.log("embed-toolkit is not installed.");
+  } else {
+    console.log("");
+    console.log("embed-toolkit uninstalled.");
+  }
 }
 
 // --- Main ---
 const args = process.argv.slice(2);
 
 if (args.includes("--uninstall")) {
-  if (fs.existsSync(INSTALL_DIR)) {
-    removeDir(INSTALL_DIR);
-    console.log("embed-toolkit uninstalled.");
-  } else {
-    console.log("embed-toolkit is not installed.");
-  }
+  uninstall();
 } else if (args.includes("--status")) {
   status();
 } else if (args.includes("--force")) {
