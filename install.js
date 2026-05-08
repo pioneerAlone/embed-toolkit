@@ -114,6 +114,7 @@ function install() {
       const src = path.join(skillsSrc, name);
       const dest = path.join(SKILLS_DIR, name);
       if (fs.existsSync(src)) {
+        removeDir(dest);
         copyDir(src, dest);
         console.log(`  ✓ ${name}`);
       } else {
@@ -126,6 +127,7 @@ function install() {
   const sharedSrc = path.join(SRC_DIR, "shared");
   const sharedDest = path.join(SHARED_DIR, "shared");
   if (fs.existsSync(sharedSrc)) {
+    removeDir(sharedDest);
     copyDir(sharedSrc, sharedDest);
     console.log(`  ✓ embed-toolkit/shared/`);
   }
@@ -134,6 +136,7 @@ function install() {
   const tmplSrc = path.join(SRC_DIR, "templates");
   const tmplDest = path.join(SHARED_DIR, "templates");
   if (fs.existsSync(tmplSrc)) {
+    removeDir(tmplDest);
     copyDir(tmplSrc, tmplDest);
     console.log(`  ✓ embed-toolkit/templates/`);
   }

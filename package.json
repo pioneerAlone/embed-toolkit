@@ -19,11 +19,15 @@
     "freertos"
   ],
   "license": "MIT",
-  "author": "",
+  "author": "embed-toolkit contributors",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/user/embed-toolkit.git"
   },
+  "bugs": {
+    "url": "https://github.com/user/embed-toolkit/issues"
+  },
+  "homepage": "https://github.com/user/embed-toolkit#readme",
   "bin": {
     "embed-toolkit": "./install.js"
   },
