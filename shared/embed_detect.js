@@ -510,4 +510,22 @@ function main() {
   console.log(JSON.stringify(finalProfile, null, 2));
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  detectOS,
+  detectBuildSystem,
+  detectTargetMCU,
+  detectRTOS,
+  detectProbes,
+  detectSerialPorts,
+  detectArtifacts,
+  detectProject,
+  readEmbedJson,
+  mergeProfile,
+  saveProfile,
+  loadProfile,
+  toolExists,
+};

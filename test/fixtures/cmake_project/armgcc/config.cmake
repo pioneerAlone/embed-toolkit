@@ -1,0 +1,1 @@
+set(CONFIG_DEVICE RW612)
