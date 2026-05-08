@@ -1,6 +1,6 @@
 # embed-toolkit
 
-[![CI](https://github.com/user/embed-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/user/embed-toolkit/actions/workflows/ci.yml)
+[![CI](https://github.com/pioneerAlone/embed-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/pioneerAlone/embed-toolkit/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/embed-toolkit)](https://www.npmjs.com/package/embed-toolkit)
 [![license](https://img.shields.io/npm/l/embed-toolkit)](LICENSE)
 
@@ -30,10 +30,10 @@ A set of 6 skills that give Claude Code the ability to build, flash, monitor, de
 npx embed-toolkit
 
 # From GitHub directly
-npx github:user/embed-toolkit
+npx github:pioneerAlone/embed-toolkit
 
 # From local clone
-git clone https://github.com/user/embed-toolkit.git
+git clone https://github.com/pioneerAlone/embed-toolkit.git
 cd embed-toolkit
 node install.js
 ```

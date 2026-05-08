@@ -22,12 +22,12 @@
   "author": "embed-toolkit contributors",
   "repository": {
     "type": "git",
-    "url": "https://github.com/user/embed-toolkit.git"
+    "url": "git+https://github.com/pioneerAlone/embed-toolkit.git"
   },
   "bugs": {
-    "url": "https://github.com/user/embed-toolkit/issues"
+    "url": "https://github.com/pioneerAlone/embed-toolkit/issues"
   },
-  "homepage": "https://github.com/user/embed-toolkit#readme",
+  "homepage": "https://github.com/pioneerAlone/embed-toolkit#readme",
   "bin": {
     "embed-toolkit": "./install.js"
   },
