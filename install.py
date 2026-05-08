@@ -30,6 +30,8 @@ SKILL_NAMES = [
     "embed-debug",
     "embed-diag",
     "embed-workflow",
+    "embed-setup",
+    "embed-test",
 ]
 
 

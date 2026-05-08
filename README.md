@@ -16,6 +16,8 @@ A set of 6 skills that give Claude Code the ability to build, flash, monitor, de
 | `embed-debug` | GDB debugging (attach/break/backtrace/crash analysis) |
 | `embed-diag` | Runtime diagnostics (shell commands, AT commands, log analysis) |
 | `embed-workflow` | One-click: build → flash → verify → diagnose |
+| `embed-setup` | Toolchain check & verification — detect missing tools, report versions, suggest installs |
+| `embed-test` | Test runner — Unity/CppUTest/Ceedling/Google Test, on-host or on-target |
 
 ## Quick Install
 
@@ -42,6 +44,8 @@ After installation, navigate to your firmware project and use any skill:
 /serial start       # Start serial monitor
 /serial view        # View captured logs
 /workflow           # Build + flash + verify + diagnose
+/setup              # Check and verify toolchain environment
+/test               # Run unit/integration tests
 ```
 
 ## How It Works
