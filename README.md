@@ -1,5 +1,9 @@
 # embed-toolkit
 
+[![CI](https://github.com/user/embed-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/user/embed-toolkit/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/embed-toolkit)](https://www.npmjs.com/package/embed-toolkit)
+[![license](https://img.shields.io/npm/l/embed-toolkit)](LICENSE)
+
 Universal embedded development skills for Claude Code.
 
 ## What is this?
