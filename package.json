@@ -33,6 +33,8 @@
   },
   "files": [
     "install.js",
+    "install.sh",
+    "install.py",
     "shared/",
     "skills/",
     "templates/",

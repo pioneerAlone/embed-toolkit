@@ -85,4 +85,55 @@ describe("installer", () => {
     // Should NOT have installed to Claude path
     assert.ok(!skillExists("embed-build"));
   });
+
+  it("OpenCode target creates command/*.md files", () => {
+    // Clean first so OpenCode shows as not installed
+    runInstall("--uninstall");
+
+    const opencodeConfig = path.join(tempHome, ".config", "opencode");
+    fs.mkdirSync(opencodeConfig, { recursive: true });
+    const opencodeCommand = path.join(opencodeConfig, "command");
+
+    runInstall();
+
+    for (const name of [
+      "embed-build", "embed-flash", "embed-serial", "embed-debug",
+      "embed-diag", "embed-workflow", "embed-setup", "embed-test",
+    ]) {
+      assert.ok(
+        fs.existsSync(path.join(opencodeCommand, `${name}.md`)),
+        `OpenCode command ${name}.md should exist`
+      );
+    }
+    // Shared files still deployed for OpenCode
+    const opencodeShared = path.join(opencodeConfig, "skills", "embed-toolkit", "shared");
+    assert.ok(fs.existsSync(opencodeShared));
+  });
+
+  it("OpenCode target does NOT create skills/<name>/SKILL.md directories", () => {
+    const opencodeConfig = path.join(tempHome, ".config", "opencode");
+    const opencodeSkills = path.join(opencodeConfig, "skills");
+
+    for (const name of ["embed-build", "embed-flash"]) {
+      assert.ok(
+        !fs.existsSync(path.join(opencodeSkills, name, "SKILL.md")),
+        `OpenCode skills/${name}/SKILL.md should NOT exist`
+      );
+    }
+  });
+
+  it("--uninstall removes OpenCode command/*.md files", () => {
+    const opencodeConfig = path.join(tempHome, ".config", "opencode");
+    const opencodeCommand = path.join(opencodeConfig, "command");
+
+    runInstall("--uninstall");
+    assert.ok(
+      !fs.existsSync(path.join(opencodeCommand, "embed-build.md")),
+      "OpenCode command file should be removed after uninstall"
+    );
+    assert.ok(
+      !fs.existsSync(path.join(opencodeCommand, "embed-flash.md")),
+      "OpenCode command file should be removed after uninstall"
+    );
+  });
 });

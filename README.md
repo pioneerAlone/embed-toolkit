@@ -26,16 +26,23 @@ A set of 6 skills that give Claude Code the ability to build, flash, monitor, de
 ## Quick Install
 
 ```bash
-# From npm (recommended)
+# curl | bash (recommended, zero dependencies)
+curl -fsSL https://raw.githubusercontent.com/pioneerAlone/embed-toolkit/main/install.sh | bash
+
+# npm (requires Node.js)
 npx embed-toolkit
 
-# From GitHub directly
+# GitHub directly (requires Node.js)
 npx github:pioneerAlone/embed-toolkit
 
 # From local clone
 git clone https://github.com/pioneerAlone/embed-toolkit.git
 cd embed-toolkit
-node install.js
+bash install.sh        # pure bash
+# or
+node install.js        # Node.js
+# or
+python3 install.py     # Python
 ```
 
 ## Quick Start
@@ -86,7 +93,7 @@ Detection priority: **user input > .embed.json > auto-detect > defaults > ask us
 ## Uninstall
 
 ```bash
-npx embed-toolkit --uninstall
+bash install.sh --uninstall        # or: node install.js --uninstall
 ```
 
 ## License

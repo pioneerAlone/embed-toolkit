@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project summary
 
-embed-toolkit is a Claude Code skill pack for embedded firmware development. It provides 6 skills (`embed-build`, `embed-flash`, `embed-serial`, `embed-debug`, `embed-diag`, `embed-workflow`) that auto-detect the host toolchain and MCU platform, then execute the right commands.
+embed-toolkit is a Claude Code skill pack for embedded firmware development. It provides 8 skills (`embed-build`, `embed-flash`, `embed-serial`, `embed-debug`, `embed-diag`, `embed-workflow`, `embed-setup`, `embed-test`) that auto-detect the host toolchain and MCU platform, then execute the right commands.
 
 The skills are installed as flat directories under `~/.claude/skills/`, one per skill, each containing a `SKILL.md`. Claude Code discovers them by scanning one level deep.
 

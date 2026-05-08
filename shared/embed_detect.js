@@ -104,6 +104,7 @@ function detectTargetMCU(workspace, buildSystem) {
       const cpuMatch = content.match(/CPU_(\w+)/);
       const mcuMatch = content.match(/MCU[= ]+(\S+)/i);
       if (mcuMatch) return mcuMatch[1];
+      if (cpuMatch) return cpuMatch[1];
     }
   }
 
@@ -458,14 +459,14 @@ function main() {
   const positionalArgs = [];
 
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === "--profile" && i + 1 < args.length) {
+    if (args[i] === "--profile" && i + 1 < args.length && !args[i + 1].startsWith("--")) {
       profilePath = args[++i];
     } else if (args[i] === "--save") {
       saveRequested = true;
       if (i + 1 < args.length && !args[i + 1].startsWith("--")) {
         savePath = args[++i];
       }
-    } else if (args[i] === "--override" && i + 1 < args.length) {
+    } else if (args[i] === "--override" && i + 1 < args.length && !args[i + 1].startsWith("--")) {
       const parts = args[++i].split("=");
       if (parts.length >= 2) {
         cliOverrides[parts[0]] = parts.slice(1).join("=");
