@@ -92,3 +92,48 @@ evidence:
   - artifact: /repo/fw/build/debug/app.elf
 next_action: embed-flash
 ```
+
+## Profile Passing Between Skills
+
+Skills pass the Project Profile to each other through a canonical file at `<workspace>/.embed_profile.json`.
+
+**Convention:**
+1. Before auto-detection, check for `.embed_profile.json` in the workspace root
+2. If present, load it as the base profile (saves re-detection time)
+3. If absent, run auto-detection from scratch
+4. After each skill completes, save the enriched profile back to `.embed_profile.json`
+5. The `embed-workflow` skill uses this file to share state across sub-skills (build → flash → serial → diag)
+
+**Loading a saved profile:**
+```
+node embed_detect.js --profile .embed_profile.json
+```
+
+**Saving after detection:**
+```
+node embed_detect.js --save
+```
+
+The saved profile includes a `_meta` block (timestamp, version, source) to detect stale profiles.
+
+## .embed.json Schema
+
+Per-project overrides in `<workspace>/.embed.json`. All fields are optional. Matches Project Profile field names exactly.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `target_mcu` | string | MCU family or chip model |
+| `serial_port` | string | Preferred serial port path or COM name |
+| `baud_rate` | number | Serial baud rate |
+| `build_system` | string | Force build system detection |
+| `build_cmd` | string | Custom build command |
+| `flash_cmd` | string | Custom flash command |
+| `flash_method` | string | Force flash method |
+| `probe` | string | Debug probe choice |
+| `probe_config` | string | Probe-specific configuration |
+| `gdb_executable` | string | Path to GDB binary |
+| `shell_commands` | string[] | Known device shell commands |
+
+**Priority:** CLI `--override` > `.embed.json` > auto-detection > defaults.
+
+Array fields (`probes`, `serial_ports`, `all_artifacts`, `shell_commands`) are merged additively — `.embed.json` values are appended rather than replacing auto-detected values.

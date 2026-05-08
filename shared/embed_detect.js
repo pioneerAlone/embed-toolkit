@@ -23,6 +23,9 @@ const path = require("path");
 const os = require("os");
 const { execSync } = require("child_process");
 
+// Fields where .embed.json values are merged into arrays rather than replaced
+const MERGE_ARRAYS = new Set(["probes", "serial_ports", "all_artifacts", "shell_commands"]);
+
 function detectOS() {
   const platform = os.platform();
   if (platform === "darwin") return "macos";
@@ -352,18 +355,134 @@ function detectProject(workspace) {
   return profile;
 }
 
+function readEmbedJson(workspace) {
+  const embedJsonPath = path.join(workspace, ".embed.json");
+  if (!fs.existsSync(embedJsonPath)) return null;
+  try {
+    const content = fs.readFileSync(embedJsonPath, "utf-8");
+    return JSON.parse(content);
+  } catch (e) {
+    console.error(`Warning: failed to parse .embed.json: ${e.message}`);
+    return null;
+  }
+}
+
+function mergeProfile(autoProfile, embedOverrides, cliOverrides) {
+  const merged = { ...autoProfile };
+
+  // Layer 1: .embed.json overrides
+  if (embedOverrides) {
+    for (const [key, value] of Object.entries(embedOverrides)) {
+      if (value === null || value === undefined) continue;
+      if (MERGE_ARRAYS.has(key) && Array.isArray(value) && Array.isArray(merged[key])) {
+        const existing = new Set(merged[key].map((item) => JSON.stringify(item)));
+        for (const item of value) {
+          if (!existing.has(JSON.stringify(item))) {
+            merged[key].push(item);
+          }
+        }
+      } else {
+        merged[key] = value;
+      }
+    }
+  }
+
+  // Layer 2: CLI overrides (highest priority)
+  if (cliOverrides) {
+    for (const [key, value] of Object.entries(cliOverrides)) {
+      if (value === null || value === undefined) continue;
+      merged[key] = value;
+    }
+  }
+
+  return merged;
+}
+
+function saveProfile(profile, filePath) {
+  const dir = path.dirname(filePath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  profile._meta = {
+    timestamp: new Date().toISOString(),
+    version: "0.1.0",
+    source: "embed_detect.js",
+  };
+  fs.writeFileSync(filePath, JSON.stringify(profile, null, 2));
+}
+
+function loadProfile(filePath) {
+  if (!fs.existsSync(filePath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  } catch (e) {
+    console.error(`Warning: failed to load profile: ${e.message}`);
+    return null;
+  }
+}
+
 // --- Main ---
 function main() {
   const args = process.argv.slice(2);
-  const workspace = args.length > 0 ? path.resolve(args[0]) : process.cwd();
+
+  // Parse CLI flags
+  let profilePath = null;
+  let savePath = null;
+  let saveRequested = false;
+  const cliOverrides = {};
+  const positionalArgs = [];
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--profile" && i + 1 < args.length) {
+      profilePath = args[++i];
+    } else if (args[i] === "--save") {
+      saveRequested = true;
+      if (i + 1 < args.length && !args[i + 1].startsWith("--")) {
+        savePath = args[++i];
+      }
+    } else if (args[i] === "--override" && i + 1 < args.length) {
+      const parts = args[++i].split("=");
+      if (parts.length >= 2) {
+        cliOverrides[parts[0]] = parts.slice(1).join("=");
+      }
+    } else if (!args[i].startsWith("--")) {
+      positionalArgs.push(args[i]);
+    }
+  }
+
+  const workspace =
+    positionalArgs.length > 0 ? path.resolve(positionalArgs[0]) : process.cwd();
 
   if (!fs.existsSync(workspace)) {
     console.error(`Error: workspace not found: ${workspace}`);
     process.exit(1);
   }
 
-  const profile = detectProject(workspace);
-  console.log(JSON.stringify(profile, null, 2));
+  // Load base profile (from --profile flag or auto-detection)
+  let baseProfile = null;
+  if (profilePath) {
+    baseProfile = loadProfile(path.resolve(profilePath));
+  }
+
+  // Auto-detect
+  const autoProfile = detectProject(workspace);
+
+  // Merge base with auto (auto wins for fields it detects)
+  const mergedBase = baseProfile ? { ...baseProfile, ...autoProfile } : autoProfile;
+
+  // Read .embed.json from workspace
+  const embedOverrides = readEmbedJson(workspace);
+
+  // Merge all layers: auto-detect + .embed.json + CLI
+  const finalProfile = mergeProfile(mergedBase, embedOverrides, cliOverrides);
+
+  // Save if requested
+  if (saveRequested) {
+    const dest = savePath || path.join(workspace, ".embed_profile.json");
+    saveProfile(finalProfile, dest);
+  }
+
+  console.log(JSON.stringify(finalProfile, null, 2));
 }
 
 main();
