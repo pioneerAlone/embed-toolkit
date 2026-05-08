@@ -193,26 +193,37 @@ function detectRTOS(workspace) {
   return walk(workspace, 0);
 }
 
+function toolExists(tool) {
+  try {
+    const cmd = os.platform() === "win32" ? `where ${tool}` : `command -v ${tool}`;
+    execSync(cmd, { stdio: "ignore" });
+    return true;
+  } catch {
+    // also try .exe variant on Windows
+    if (os.platform() === "win32" && !tool.endsWith(".exe")) {
+      try {
+        execSync(`where ${tool}.exe`, { stdio: "ignore" });
+        return true;
+      } catch {
+        // not found
+      }
+    }
+    return false;
+  }
+}
+
 function detectProbes() {
   const probes = [];
-  try {
-    // Check PATH for known probe tools
-    ["JLinkExe", "openocd", "pyocd", "st-flash", "st-info"].forEach((tool) => {
-      try {
-        execSync(`which ${tool}`, { stdio: "ignore" });
-        if (tool === "JLinkExe") probes.push("jlink");
-        else if (tool === "openocd") probes.push("openocd");
-        else if (tool === "pyocd") probes.push("pyocd");
-        else if (tool === "st-flash" || tool === "st-info") {
-          if (!probes.includes("stlink")) probes.push("stlink");
-        }
-      } catch (e) {
-        // tool not found
+  ["JLinkExe", "openocd", "pyocd", "st-flash", "st-info"].forEach((tool) => {
+    if (toolExists(tool)) {
+      if (tool === "JLinkExe") probes.push("jlink");
+      else if (tool === "openocd") probes.push("openocd");
+      else if (tool === "pyocd") probes.push("pyocd");
+      else if (tool === "st-flash" || tool === "st-info") {
+        if (!probes.includes("stlink")) probes.push("stlink");
       }
-    });
-  } catch (e) {
-    // ignore
-  }
+    }
+  });
   return probes;
 }
 
@@ -251,8 +262,22 @@ function detectSerialPorts() {
       // ignore
     }
   } else {
-    // Windows — can't scan via filesystem easily
-    // User must specify COM port
+    // Windows — try PowerShell, fall back to asking user
+    try {
+      const result = execSync(
+        'powershell -Command "[System.IO.Ports.SerialPort]::GetPortNames()"',
+        { stdio: "pipe", encoding: "utf-8" }
+      );
+      const lines = result.trim().split(/\r?\n/);
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed && trimmed.startsWith("COM")) {
+          ports.push(trimmed);
+        }
+      }
+    } catch {
+      // PowerShell or .NET SerialPort unavailable — user must specify manually
+    }
   }
 
   return ports;
