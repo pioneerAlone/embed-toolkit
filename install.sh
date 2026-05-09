@@ -19,6 +19,7 @@ REPO_BRANCH="main"
 SKILL_NAMES=(
   "embed-build" "embed-flash" "embed-serial" "embed-debug"
   "embed-diag" "embed-workflow" "embed-setup" "embed-test"
+  "embed-memory" "embed-crash" "embed-static"
 )
 
 # --- Parse args ---

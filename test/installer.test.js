@@ -32,11 +32,12 @@ describe("installer", () => {
     return fs.existsSync(path.join(claudeSkills, name, "SKILL.md"));
   }
 
-  it("fresh install creates all 8 skills", () => {
+  it("fresh install creates all skills", () => {
     runInstall();
     for (const name of [
       "embed-build", "embed-flash", "embed-serial", "embed-debug",
       "embed-diag", "embed-workflow", "embed-setup", "embed-test",
+      "embed-memory", "embed-crash", "embed-static",
     ]) {
       assert.ok(skillExists(name), `skill ${name} should exist`);
     }

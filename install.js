@@ -40,6 +40,9 @@ const SKILL_NAMES = [
   "embed-workflow",
   "embed-setup",
   "embed-test",
+  "embed-memory",
+  "embed-crash",
+  "embed-static",
 ];
 
 // --- Target discovery ---

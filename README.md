@@ -22,6 +22,9 @@ A set of 8 skills that give Claude Code the ability to build, flash, monitor, de
 | `embed-workflow` | One-click: build → flash → verify → diagnose |
 | `embed-setup` | Toolchain check & verification — detect missing tools, report versions, suggest installs |
 | `embed-test` | Test runner — Unity/CppUTest/Ceedling/Google Test, on-host or on-target |
+| `embed-memory` | Memory analysis — Flash/RAM usage from .map/ELF, symbol size ranking, build diff |
+| `embed-crash` | Crash analysis — HardFault/BusFault/UsageFault decoding, stack trace reconstruction |
+| `embed-static` | Static analysis — cppcheck, clang-tidy, GCC analyzer, MISRA-C compliance checks |
 
 ## Quick Install
 
@@ -60,6 +63,9 @@ After installation, navigate to your firmware project and use any skill:
 /workflow           # Build + flash + verify + diagnose
 /setup              # Check and verify toolchain environment
 /test               # Run unit/integration tests
+/memory             # Analyze firmware memory (Flash/RAM usage from .map/ELF)
+/crash              # Analyze crash dumps (HardFault decode, stack trace)
+/static             # Run static analysis (cppcheck, clang-tidy, MISRA)
 ```
 
 ## How It Works
