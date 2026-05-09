@@ -8,7 +8,7 @@ Universal embedded development skills for Claude Code.
 
 ## What is this?
 
-A set of 8 skills that give Claude Code the ability to build, flash, monitor, debug, and diagnose embedded firmware projects — across MCU platforms and build systems.
+A set of 11 skills that give Claude Code the ability to build, flash, monitor, debug, diagnose, analyze memory, debug crashes, and run static analysis on embedded firmware projects — across MCU platforms and build systems.
 
 ## Skills
 
