@@ -8,7 +8,7 @@ Universal embedded development skills for Claude Code.
 
 ## What is this?
 
-A set of 6 skills that give Claude Code the ability to build, flash, monitor, debug, and diagnose embedded firmware projects — across MCU platforms and build systems.
+A set of 8 skills that give Claude Code the ability to build, flash, monitor, debug, and diagnose embedded firmware projects — across MCU platforms and build systems.
 
 ## Skills
 
@@ -26,24 +26,27 @@ A set of 6 skills that give Claude Code the ability to build, flash, monitor, de
 ## Quick Install
 
 ```bash
-# curl | bash (recommended, zero dependencies)
+# Install to all detected tools (Claude Code, OpenCode, etc.)
 curl -fsSL https://raw.githubusercontent.com/pioneerAlone/embed-toolkit/main/install.sh | bash
 
-# npm (requires Node.js)
-npx embed-toolkit
+# Install to a specific tool only
+curl -fsSL https://raw.githubusercontent.com/pioneerAlone/embed-toolkit/main/install.sh | bash -s -- --tool claude
+curl -fsSL https://raw.githubusercontent.com/pioneerAlone/embed-toolkit/main/install.sh | bash -s -- --tool opencode
 
-# GitHub directly (requires Node.js)
-npx github:pioneerAlone/embed-toolkit
+# Install from GitHub via npx (Node.js required)
+npx github:pioneerAlone/embed-toolkit --force --tool opencode
 
-# From local clone
+# Install from local clone
 git clone https://github.com/pioneerAlone/embed-toolkit.git
 cd embed-toolkit
-bash install.sh        # pure bash
+bash install.sh        # pure bash, zero dependencies
 # or
 node install.js        # Node.js
 # or
-python3 install.py     # Python
+python3 install.py     # Python 3
 ```
+
+> **Note:** If `npx` seems to use a stale version, clear its cache first: `rm -rf ~/.npm/_npx`
 
 ## Quick Start
 
@@ -93,7 +96,12 @@ Detection priority: **user input > .embed.json > auto-detect > defaults > ask us
 ## Uninstall
 
 ```bash
-bash install.sh --uninstall        # or: node install.js --uninstall
+# Remove from all targets
+bash install.sh --uninstall
+
+# Remove from a specific tool
+bash install.sh --uninstall --tool opencode
+node install.js --uninstall --tool claude
 ```
 
 ## License
