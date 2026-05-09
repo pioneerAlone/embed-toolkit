@@ -285,24 +285,27 @@ function installToTarget(target) {
 }
 
 function install(targets) {
-  // Check if already installed on ANY target
-  let alreadyInstalled = false;
+  // Check if ALL skills are already installed on every target
+  let allInstalled = true;
+  let partialInstalled = false;
   for (const t of targets) {
     const s = checkTargetStatus(t);
-    if (s.installed.length > 0) {
-      alreadyInstalled = true;
-      break;
-    }
+    if (s.installed.length > 0) partialInstalled = true;
+    if (s.installed.length < SKILL_NAMES.length) allInstalled = false;
   }
 
-  if (alreadyInstalled) {
+  if (allInstalled) {
     console.log("embed-toolkit: Already installed.");
     console.log("  Use --force to reinstall, or --uninstall to remove.\n");
     status(targets);
     return;
   }
 
-  console.log("embed-toolkit installer");
+  if (partialInstalled) {
+    console.log("embed-toolkit: Installing missing skills...\n");
+  } else {
+    console.log("embed-toolkit installer");
+  }
   console.log(`  Source: ${SRC_DIR}\n`);
 
   for (const t of targets) {

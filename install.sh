@@ -189,22 +189,31 @@ check_status() {
 }
 
 do_install() {
-  local already=false
+  local all_installed=true
+  local partial_installed=false
   while IFS='|' read -r name skills_dir shared_dir type; do
+    local installed=0
+    local total="${#SKILL_NAMES[@]}"
     for skill in "${SKILL_NAMES[@]}"; do
       local path
       path="$(skill_file_for "$type" "$skills_dir" "$skill")"
       if [[ -f "$path" ]]; then
-        already=true; break 2
+        ((installed++))
       fi
     done
+    if [[ "$installed" -gt 0 ]]; then
+      partial_installed=true
+    fi
+    if [[ "$installed" -lt "$total" ]]; then
+      all_installed=false
+    fi
   done < <(all_targets)
 
   if $FORCE; then
     echo "  Removing previous installation..."
   fi
 
-  if $already && ! $FORCE; then
+  if $all_installed && ! $FORCE; then
     echo "embed-toolkit: Already installed."
     echo "  Use --force to reinstall, or --uninstall to remove."
     echo ""
@@ -212,7 +221,11 @@ do_install() {
     return
   fi
 
-  echo "embed-toolkit installer"
+  if $partial_installed && ! $FORCE; then
+    echo "embed-toolkit: Installing missing skills..."
+  else
+    echo "embed-toolkit installer"
+  fi
   echo "  Source: $SRC_DIR"
   echo ""
 

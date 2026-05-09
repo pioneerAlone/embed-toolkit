@@ -272,20 +272,25 @@ def install_to_target(target):
 
 def install(targets):
     """Install to all targets (checks for existing install first)."""
-    already_installed = False
+    all_installed = True
+    partial_installed = False
     for t in targets:
         s = check_target_status(t)
         if s["installed"]:
-            already_installed = True
-            break
+            partial_installed = True
+        if len(s["installed"]) < len(SKILL_NAMES):
+            all_installed = False
 
-    if already_installed:
+    if all_installed:
         print("embed-toolkit: Already installed.")
         print("  Use --force to reinstall, or --uninstall to remove.\n")
         show_status(targets)
         return
 
-    print("embed-toolkit installer")
+    if partial_installed:
+        print("embed-toolkit: Installing missing skills...\n")
+    else:
+        print("embed-toolkit installer")
     print(f"  Source: {SRC_DIR}\n")
 
     for t in targets:
